@@ -7,9 +7,6 @@ param(
 
 $root        = "$PSScriptRoot\checkouts\$Ref"
 $chromiumDir = "$root\chromium"
-$srcDir      = "$chromiumDir\src"
-$cefDir      = "$srcDir\cef"
-$gclientFile = "$chromiumDir\.gclient"
 $entriesFile = "$chromiumDir\.gclient_entries"
 
 $env:GN_DEFINES         = "is_official_build=true"
@@ -64,9 +61,4 @@ try {
 }
 
 # 4. Apply CEF patches and generate the GN build files (Debug + Release).
-Push-Location $cefDir
-try {
-    & python3 tools/gclient_hook.py
-} finally {
-    Pop-Location
-}
+& "$PSScriptRoot\create.ps1" -Ref $Ref
