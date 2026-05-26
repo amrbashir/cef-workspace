@@ -15,6 +15,7 @@ $cefDir = "$root\chromium\src\cef"
 Push-Location $cefDir
 try {
    & python3 tools\make_distrib.py `
+    --output-dir "$root\chromium\src\cef\binary_distrib" `
     --ninja-build `
     --x64-build `
     --allow-partial `
