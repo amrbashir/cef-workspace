@@ -17,6 +17,15 @@
 
 ```powershell
 .\build.ps1
+.\make_distrib.ps1 --minimal
+```
+
+`build.ps1` builds `out\Release_GN_x64\cef` with `autoninja` against the existing checkout (no resync). `make_distrib.ps1 --minimal` packages release-only binaries (omit `--minimal` to include whatever's present in `out/`).
+
+### Official distribution build
+
+```powershell
+.\build-official.ps1
 ```
 
 Builds an official x64 minimal CEF distribution with `tar.bz2` archives, no debug build, docs, or symbols.
@@ -25,11 +34,13 @@ Builds an official x64 minimal CEF distribution with `tar.bz2` archives, no debu
 
 | Script | Purpose |
 | --- | --- |
-| `build.ps1 [-Ref master] [args...]` | Build an official x64 minimal CEF distribution via `automate-git.py`. |
+| `build.ps1 [-Ref master] [autoninja args...]` | Build `cef` Release x64 with `autoninja` against the existing checkout. |
+| `build-official.ps1 [-Ref master] [args...]` | Build an official x64 minimal CEF distribution via `automate-git.py`. |
 | `update.ps1 [-Ref master] [args...]` | Fetch/update Chromium + CEF, repair corrupt deps, sync hooks, and generate GN files. |
 | `create.ps1 [-Ref master]` | Run CEF `gclient_hook.py` for the checkout. |
 | `dev.ps1 [-Ref master] [cefclient args...]` | Build `cef` Debug x64 with `autoninja`, then run `cefclient.exe`. |
 | `fix_style.ps1 [-Ref master] [args...]` | Run CEF `tools\fix_style.py`. |
 | `make_distrib.ps1 [-Ref master] [args...]` | Run CEF `tools\make_distrib.py` for a partial x64 binary distribution. |
+| `patch_updater.ps1 [-Ref master] [args...]` | Run CEF `tools\patch_updater.py` to update patch files against the checkout. |
 | `generate-index-json.sh [directory]` | Generate CEF binary `index.json` from `cef_binary_*.tar.bz2` files. |
 | `repack.sh <directory> <new_version>` | Repack CEF binary archives with a replaced head version. |

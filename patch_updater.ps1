@@ -7,16 +7,12 @@ param(
 
 
 $root = "$PSScriptRoot\checkouts\$Ref"
-$env:Path = "$root\depot_tools;$env:Path"
-$env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
-$env:GYP_MSVS_VERSION = "2022"
 
-$src = "$root\chromium\src"
-$outDir = "out\Release_GN_x64"
+$cefDir = "$root\chromium\src\cef"
 
-Push-Location $src
+Push-Location $cefDir
 try {
-    & autoninja -C $outDir cef $Rest
+    python3 tools\patch_updater.py $Rest
 } finally {
     Pop-Location
 }
