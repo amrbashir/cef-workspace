@@ -7,7 +7,34 @@ param(
 
 $root        = "$PSScriptRoot\checkouts\$Ref"
 $chromiumDir = "$root\chromium"
+$cefSrcDir   = "$chromiumDir\src\cef"
 $entriesFile = "$chromiumDir\.gclient_entries"
+
+# 0. Refuse to run destructive automate-git flags while src/cef has work that
+#    isn't safely on a remote. These flags blow away local changes (see
+#    README / automate-git.py: --force-clean wipes cef_dir; --force-update and
+#    --force-cef-update set discard_local_changes which adds `git checkout
+#    --force` and `gclient sync --reset`).
+$destructiveFlags = @('--force-clean', '--force-clean-deps', '--force-update', '--force-cef-update')
+$requested = @($Rest | Where-Object { $destructiveFlags -contains $_ })
+if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cefSrcDir '.git'))) {
+    $dirty   = & git -C $cefSrcDir status --porcelain
+    $unpushed = ''
+    & git -C $cefSrcDir rev-parse --abbrev-ref --symbolic-full-name '@{u}' > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $unpushed = & git -C $cefSrcDir log '@{u}..HEAD' --oneline
+    } else {
+        # No upstream configured -- treat HEAD as unpushed so the user is warned.
+        $unpushed = & git -C $cefSrcDir log -1 --oneline
+    }
+    if ($dirty -or $unpushed) {
+        Write-Host "ERROR: $($requested -join ', ') would discard work in $cefSrcDir" -ForegroundColor Red
+        if ($dirty)    { Write-Host "  uncommitted changes:"; $dirty    | ForEach-Object { Write-Host "    $_" } }
+        if ($unpushed) { Write-Host "  unpushed commits:";    $unpushed | ForEach-Object { Write-Host "    $_" } }
+        Write-Host "Commit and push, or move the work elsewhere, then re-run." -ForegroundColor Yellow
+        exit 1
+    }
+}
 
 $env:GN_DEFINES         = "is_official_build=true"
 $env:CEF_ARCHIVE_FORMAT = "tar.bz2"
