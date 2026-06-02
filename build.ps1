@@ -1,6 +1,7 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$Ref = "master",
+    [boolean]$Release = $false,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
 )
@@ -12,7 +13,7 @@ $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
 $env:GYP_MSVS_VERSION = "2022"
 
 $src = "$root\chromium\src"
-$outDir = "out\Release_GN_x64"
+$outDir = if ($Release) { "out\Release_GN_x64" } else { "out\Debug_GN_x64" }
 
 Push-Location $src
 try {
