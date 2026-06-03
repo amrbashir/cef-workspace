@@ -6,22 +6,20 @@ param(
     [string[]]$Rest
 )
 
-$root = "$PSScriptRoot\checkouts\$Ref"
+. "$PSScriptRoot\_common.ps1"
+$cef = Initialize-CefEnv -Ref $Ref
 
-$cefDir = "$root\chromium\src\cef"
-$env:Path = "$root\depot_tools;$env:Path"
-
-$args = @("--ninja-build", "--x64-build")
+$cliArgs = @("--ninja-build", "--x64-build")
 if ($Minimal) {
-    $args += "--minimal"
+    $cliArgs += "--minimal"
 } else {
-    $args += "--allow-partial"
+    $cliArgs += "--allow-partial"
 }
-if ($Rest) { $args += $Rest }
+if ($Rest) { $cliArgs += $Rest }
 
-Push-Location $cefDir
+Push-Location $cef.CefDir
 try {
-    & ./tools/make_distrib.bat @args
+    Invoke-Native .\tools\make_distrib.bat @cliArgs
 } finally {
     Pop-Location
 }

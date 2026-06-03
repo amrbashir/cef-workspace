@@ -1,23 +1,19 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$Ref = "master",
-    [boolean]$Release = $false,
+    [switch]$Release,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
 )
 
+. "$PSScriptRoot\_common.ps1"
+$cef = Initialize-CefEnv -Ref $Ref
 
-$root = "$PSScriptRoot\checkouts\$Ref"
-$env:Path = "$root\depot_tools;$env:Path"
-$env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
-$env:GYP_MSVS_VERSION = "2022"
-
-$src = "$root\chromium\src"
 $outDir = if ($Release) { "out\Release_GN_x64" } else { "out\Debug_GN_x64" }
 
-Push-Location $src
+Push-Location "$($cef.ChromiumDir)\src"
 try {
-    & autoninja -C $outDir cef $Rest
+    Invoke-Native autoninja -C $outDir cef @Rest
 } finally {
     Pop-Location
 }

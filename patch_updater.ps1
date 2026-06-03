@@ -5,14 +5,12 @@ param(
     [string[]]$Rest
 )
 
+. "$PSScriptRoot\_common.ps1"
+$cef = Initialize-CefEnv -Ref $Ref
 
-$root = "$PSScriptRoot\checkouts\$Ref"
-
-$cefDir = "$root\chromium\src\cef"
-
-Push-Location $cefDir
+Push-Location $cef.CefDir
 try {
-    python3 tools\patch_updater.py $Rest
+    Invoke-Native python3 tools\patch_updater.py @Rest
 } finally {
     Pop-Location
 }

@@ -5,18 +5,15 @@ param(
     [string[]]$Rest
 )
 
+. "$PSScriptRoot\_common.ps1"
+$cef = Initialize-CefEnv -Ref $Ref
 
-$root = "$PSScriptRoot\checkouts\$Ref"
-$env:Path = "$root\depot_tools;$env:Path"
+$env:GN_DEFINES   = "is_component_build=true"
+$env:GN_ARGUMENTS = "--ide=vs2022 --sln=cef --filters=//cef/*"
 
-$GN_DEFINES="is_component_build=true"
-$GN_ARGUMENTS="--ide=vs2022 --sln=cef --filters=//cef/*"
-
-$cefDir = "$root\chromium\src\cef"
-
-Push-Location $cefDir
+Push-Location $cef.CefDir
 try {
-    python3 tools\gclient_hook.py
+    Invoke-Native python3 tools\gclient_hook.py @Rest
 } finally {
     Pop-Location
 }

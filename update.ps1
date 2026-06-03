@@ -5,10 +5,9 @@ param(
     [string[]]$Rest
 )
 
-$root        = "$PSScriptRoot\checkouts\$Ref"
-$chromiumDir = "$root\chromium"
-$cefSrcDir   = "$chromiumDir\src\cef"
-$entriesFile = "$chromiumDir\.gclient_entries"
+. "$PSScriptRoot\_common.ps1"
+$cef = Initialize-CefEnv -Ref $Ref
+$entriesFile = "$($cef.ChromiumDir)\.gclient_entries"
 
 # 0. Refuse to run destructive automate-git flags while src/cef has work that
 #    isn't safely on a remote. These flags blow away local changes (see
@@ -17,18 +16,18 @@ $entriesFile = "$chromiumDir\.gclient_entries"
 #    --force` and `gclient sync --reset`).
 $destructiveFlags = @('--force-clean', '--force-clean-deps', '--force-update', '--force-cef-update')
 $requested = @($Rest | Where-Object { $destructiveFlags -contains $_ })
-if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cefSrcDir '.git'))) {
-    $dirty   = & git -C $cefSrcDir status --porcelain
+if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cef.CefDir '.git'))) {
+    $dirty   = & git -C $cef.CefDir status --porcelain
     $unpushed = ''
-    & git -C $cefSrcDir rev-parse --abbrev-ref --symbolic-full-name '@{u}' > $null 2>&1
+    & git -C $cef.CefDir rev-parse --abbrev-ref --symbolic-full-name '@{u}' > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        $unpushed = & git -C $cefSrcDir log '@{u}..HEAD' --oneline
+        $unpushed = & git -C $cef.CefDir log '@{u}..HEAD' --oneline
     } else {
         # No upstream configured -- treat HEAD as unpushed so the user is warned.
-        $unpushed = & git -C $cefSrcDir log -1 --oneline
+        $unpushed = & git -C $cef.CefDir log -1 --oneline
     }
     if ($dirty -or $unpushed) {
-        Write-Host "ERROR: $($requested -join ', ') would discard work in $cefSrcDir" -ForegroundColor Red
+        Write-Host "ERROR: $($requested -join ', ') would discard work in $($cef.CefDir)" -ForegroundColor Red
         if ($dirty)    { Write-Host "  uncommitted changes:"; $dirty    | ForEach-Object { Write-Host "    $_" } }
         if ($unpushed) { Write-Host "  unpushed commits:";    $unpushed | ForEach-Object { Write-Host "    $_" } }
         Write-Host "Commit and push, or move the work elsewhere, then re-run." -ForegroundColor Yellow
@@ -38,21 +37,17 @@ if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cefSrcDir '.git'))) {
 
 $env:GN_DEFINES         = "is_official_build=true"
 $env:CEF_ARCHIVE_FORMAT = "tar.bz2"
-$env:GYP_MSVS_VERSION   = "2022"
 
 # 1. Chromium/CEF checkout + version patches. --with-pgo-profiles makes a fresh
 #    .gclient enable PGO profile download (required by the Release config).
-python3 $PSScriptRoot/automate-git.py `
-  --download-dir=$root `
-  --checkout=origin/$Ref `
-  --no-chromium-history `
-  --with-pgo-profiles `
-  --no-build `
-  --no-distrib $Rest
-
-# Steps below run with depot_tools on PATH and make the run resumable.
-$env:Path = "$root\depot_tools;$env:Path"
-$env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
+Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
+    --download-dir=$($cef.Root) `
+    --checkout=origin/$Ref `
+    --no-chromium-history `
+    --with-pgo-profiles `
+    --no-build `
+    --no-distrib `
+    @Rest
 
 # 2. Repair deps left corrupt by an interrupted sync: a .git directory with no
 #    resolvable HEAD. gclient can't recover these (and `gclient sync --force`
@@ -66,7 +61,7 @@ if (Test-Path $entriesFile) {
              ForEach-Object { $_.Matches[0].Groups[1].Value } |
              Where-Object { $_ -ne 'src' -and $_ -notmatch '[<>:"|?*]' }
     foreach ($rel in $paths) {
-        $full = Join-Path $chromiumDir ($rel -replace '/', '\')
+        $full = Join-Path $cef.ChromiumDir ($rel -replace '/', '\')
         if (Test-Path (Join-Path $full ".git")) {
             & git -C $full rev-parse --verify --quiet HEAD > $null 2>&1
             if ($LASTEXITCODE -ne 0) {
@@ -79,10 +74,10 @@ if (Test-Path $entriesFile) {
 
 # 3. Complete the DEPS sync. Resumable: only fetches what's missing, and is
 #    a no-op when the tree is already complete.
-Push-Location $chromiumDir
+Push-Location $cef.ChromiumDir
 try {
-    & gclient sync --nohooks --no-history
-    & gclient runhooks
+    Invoke-Native gclient sync --nohooks --no-history
+    Invoke-Native gclient runhooks
 } finally {
     Pop-Location
 }
