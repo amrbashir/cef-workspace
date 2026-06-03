@@ -7,6 +7,7 @@ param(
 
 
 $root = "$PSScriptRoot\checkouts\$Ref"
+$env:Path = "$root\depot_tools;$env:Path"
 
 $GN_DEFINES="is_component_build=true"
 $GN_ARGUMENTS="--ide=vs2022 --sln=cef --filters=//cef/*"
