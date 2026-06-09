@@ -112,7 +112,6 @@ def run_command(args, rest):
     guard_destructive_flags(cef, rest)
 
     os.environ["GN_DEFINES"] = "is_official_build=true"
-    os.environ["CEF_ARCHIVE_FORMAT"] = "tar.bz2"
 
     run(
         [

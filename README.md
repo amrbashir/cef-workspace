@@ -37,12 +37,12 @@ python3 workspace.py build-official
 | `python3 workspace.py build-official`  | One-shot official Release build via `automate-git.py` (PGO, minimal distrib).              |
 | `python3 workspace.py fix-style`       | Reformat CEF sources (`tools/fix_style.py`).                                                |
 | `python3 workspace.py patch-updater`   | Regenerate CEF patch files from the current tree (`tools/patch_updater.py`).                |
-| `python3 workspace.py gen-index <dir> <output-file>` | Generate an `index.json` payload from `cef_binary_*.tar.bz2` files.        |
+| `python3 workspace.py gen-index [--ref <name>] [dir] [output-file]` | Generate an `index.json` payload from `cef_binary_*.tar.bz2` files. Defaults to `checkouts/<ref>/chromium/src/cef/binary_distrib/index.json`. |
 | `python3 workspace.py repack <archive> <version>` | Repack one `cef_binary_*.tar.bz2` file with a new leading CEF version.          |
 
 Direct command modules use the same arguments. For example:
 
 ```bash
 python3 workspace_commands/build.py --release
-python3 workspace_commands/gen_index.py ./downloads index.json
+python3 workspace_commands/gen_index.py
 ```

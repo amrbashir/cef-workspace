@@ -27,7 +27,6 @@ def run_command(args, rest):
     cef = init_env(args.ref)
     arch = args.arch or default_arch()
     os.environ["GN_DEFINES"] = "is_official_build=true"
-    os.environ["CEF_ARCHIVE_FORMAT"] = "tar.bz2"
     run(
         [
             "python3",

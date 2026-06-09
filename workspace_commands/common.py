@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_CEF_ARCHIVE_FORMAT = "tar.bz2"
 
 
 class CefEnv:
@@ -39,6 +40,7 @@ def init_env(ref):
     os.environ["PATH"] = str(cef.root / "depot_tools") + os.pathsep + os.environ.get("PATH", "")
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
     os.environ["GYP_MSVS_VERSION"] = "2022"
+    os.environ["CEF_ARCHIVE_FORMAT"] = DEFAULT_CEF_ARCHIVE_FORMAT
     return cef
 
 
