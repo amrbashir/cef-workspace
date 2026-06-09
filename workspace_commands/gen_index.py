@@ -61,10 +61,7 @@ def sha1(path):
 def archive_suffix():
     archive_format = os.environ.get("CEF_ARCHIVE_FORMAT", DEFAULT_CEF_ARCHIVE_FORMAT)
     normalized = archive_format.removeprefix(".")
-    if normalized not in ARCHIVE_SUFFIXES:
-        expected = ", ".join(sorted(ARCHIVE_SUFFIXES))
-        raise SystemExit(f"Unsupported archive format {archive_format!r}; expected one of: {expected}")
-    return ARCHIVE_SUFFIXES[normalized]
+    return ARCHIVE_SUFFIXES.get(normalized, f".{normalized}")
 
 
 def index_entry_for(path):

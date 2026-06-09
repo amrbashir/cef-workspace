@@ -9,7 +9,7 @@ if __package__ is None:
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from workspace_commands.common import add_ref, init_env, run
+from workspace_commands.common import add_ref, init_env, run, set_gn_defines
 
 
 def add_parser(subparsers):
@@ -20,7 +20,7 @@ def add_parser(subparsers):
 
 def run_command(args, rest):
     cef = init_env(args.ref)
-    os.environ["GN_DEFINES"] = "is_component_build=true"
+    set_gn_defines(is_official_build="true", is_component_build="false")
     os.environ["GN_ARGUMENTS"] = "--ide=vs2022 --sln=cef --filters=//cef/*"
     run(["python3", "tools/gclient_hook.py", *rest], cwd=cef.cef_dir)
 

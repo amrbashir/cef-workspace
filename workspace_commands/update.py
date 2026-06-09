@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
 import platform
 import re
 import shutil
@@ -13,7 +12,7 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from workspace_commands import create
-from workspace_commands.common import SCRIPT_DIR, add_ref, init_env, run
+from workspace_commands.common import SCRIPT_DIR, add_ref, init_env, run, set_gn_defines
 
 
 DESTRUCTIVE_FLAGS = {
@@ -111,7 +110,7 @@ def run_command(args, rest):
     cef = init_env(args.ref)
     guard_destructive_flags(cef, rest)
 
-    os.environ["GN_DEFINES"] = "is_official_build=true"
+    set_gn_defines(is_official_build="true", is_component_build="false")
 
     run(
         [

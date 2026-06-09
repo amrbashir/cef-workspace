@@ -41,7 +41,29 @@ def init_env(ref):
     os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
     os.environ["GYP_MSVS_VERSION"] = "2022"
     os.environ["CEF_ARCHIVE_FORMAT"] = DEFAULT_CEF_ARCHIVE_FORMAT
+    set_gn_defines(is_official_build="true", is_component_build="false")
     return cef
+
+
+def set_gn_defines(**defines):
+    gn_defines = os.environ.get("GN_DEFINES", "").split()
+    values = {}
+    order = []
+
+    for define in gn_defines:
+        key, separator, value = define.partition("=")
+        if not separator:
+            continue
+        if key not in values:
+            order.append(key)
+        values[key] = value
+
+    for key, value in defines.items():
+        if key not in values:
+            order.append(key)
+        values[key] = value
+
+    os.environ["GN_DEFINES"] = " ".join(f"{key}={values[key]}" for key in order)
 
 
 def run(cmd, cwd=None):

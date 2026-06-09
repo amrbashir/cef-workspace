@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
 import sys
 
 if __package__ is None:
@@ -9,7 +8,7 @@ if __package__ is None:
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from workspace_commands.common import SCRIPT_DIR, add_ref, default_arch, init_env, run
+from workspace_commands.common import SCRIPT_DIR, add_ref, default_arch, init_env, run, set_gn_defines
 
 
 def add_parser(subparsers):
@@ -26,7 +25,7 @@ def add_parser(subparsers):
 def run_command(args, rest):
     cef = init_env(args.ref)
     arch = args.arch or default_arch()
-    os.environ["GN_DEFINES"] = "is_official_build=true"
+    set_gn_defines(is_official_build="true", is_component_build="false")
     run(
         [
             "python3",
