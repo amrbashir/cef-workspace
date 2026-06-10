@@ -1,5 +1,6 @@
 import os
 import platform
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -66,8 +67,21 @@ def set_gn_defines(**defines):
     os.environ["GN_DEFINES"] = " ".join(f"{key}={values[key]}" for key in order)
 
 
+def resolve_command(command):
+    command = str(command)
+    if os.name != "nt" or Path(command).suffix:
+        return command
+
+    for extension in os.environ.get("PATHEXT", "").split(os.pathsep):
+        resolved = shutil.which(command + extension)
+        if resolved:
+            return resolved
+    return command
+
+
 def run(cmd, cwd=None):
-    completed = subprocess.run([str(part) for part in cmd], cwd=str(cwd) if cwd else None)
+    resolved = [resolve_command(cmd[0]), *[str(part) for part in cmd[1:]]]
+    completed = subprocess.run(resolved, cwd=str(cwd) if cwd else None)
     if completed.returncode:
         raise SystemExit(completed.returncode)
 
