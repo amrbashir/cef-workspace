@@ -72,9 +72,23 @@ def index_entry_for(path):
         if without_suffix.endswith(suffix):
             without_suffix = without_suffix.removesuffix(suffix)
             break
-    file_type = without_suffix.rsplit("_", 1)[1]
-    platform_name = without_suffix.rsplit("_", 2)[1]
-    cef_version = rest.split(f"_{platform_name}_", 1)[0]
+    platform_name = None
+    cef_version = None
+    file_type = None
+    for candidate in ALL_PLATFORMS:
+        separator = f"_{candidate}"
+        if without_suffix.endswith(separator):
+            platform_name = candidate
+            cef_version = without_suffix.removesuffix(separator)
+            file_type = "standard"
+            break
+        separator += "_"
+        if separator in without_suffix:
+            platform_name = candidate
+            cef_version, file_type = without_suffix.split(separator, 1)
+            break
+    if not platform_name:
+        raise ValueError(f"Cannot determine CEF archive platform: {name}")
     chromium_version = cef_version.rsplit("chromium-", 1)[1]
     stat = path.stat()
     last_modified = datetime.datetime.fromtimestamp(
@@ -112,7 +126,21 @@ def run_command(args, rest=None):
     result = {platform_name: {"versions": []} for platform_name in ALL_PLATFORMS}
     for path in sorted(directory.glob(f"cef_binary_*{archive_suffix()}")):
         platform_name, version = index_entry_for(path)
-        result.setdefault(platform_name, {"versions": []})["versions"] = [version]
+        versions = result.setdefault(platform_name, {"versions": []})["versions"]
+        existing = next(
+            (
+                item
+                for item in versions
+                if item["cef_version"] == version["cef_version"]
+                and item["chromium_version"] == version["chromium_version"]
+                and item["channel"] == version["channel"]
+            ),
+            None,
+        )
+        if existing:
+            existing["files"].extend(version["files"])
+        else:
+            versions.append(version)
     output_file.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
 
 
