@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import platform
 import re
 import shutil
 import subprocess
@@ -12,7 +11,17 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from workspace_commands import create
-from workspace_commands.common import add_ref, ensure_automate_git, init_env, run, set_gn_defines
+from workspace_commands.common import (
+    add_arch_args,
+    add_ref,
+    cef_build_args,
+    configure_build_environment,
+    ensure_automate_git,
+    init_env,
+    run,
+    selected_arch,
+    with_pgo_profiles,
+)
 
 
 DESTRUCTIVE_FLAGS = {
@@ -26,11 +35,7 @@ DESTRUCTIVE_FLAGS = {
 def add_parser(subparsers):
     parser = subparsers.add_parser("update", help="Sync Chromium/CEF and generate build files.")
     add_ref(parser)
-    parser.add_argument(
-        "--arch",
-        choices=["x64", "arm64"],
-        help="Target architecture passed to automate-git.py. Defaults to arm64 on macOS.",
-    )
+    add_arch_args(parser)
     return parser
 
 
@@ -103,43 +108,37 @@ def repair_corrupt_entries(cef):
 
 
 def run_command(args, rest):
-    arch = args.arch or ("arm64" if platform.system() == "Darwin" else None)
-    if arch:
-        rest = [f"--{arch}-build", *rest]
+    arch = selected_arch(args)
+    rest = [*cef_build_args(arch), *rest]
 
     cef = init_env(args.ref)
     guard_destructive_flags(cef, rest)
 
-    set_gn_defines(is_official_build="true", is_component_build="false")
+    configure_build_environment(arch)
 
-    run(
-        [
-            "python3",
-            ensure_automate_git(),
-            f"--download-dir={cef.root}",
-            f"--checkout=origin/{args.ref}",
-            "--no-chromium-history",
-            "--with-pgo-profiles",
-            "--no-build",
-            "--no-distrib",
-            *rest,
-        ]
-    )
+    cli_args = [
+        "python3",
+        ensure_automate_git(),
+        f"--download-dir={cef.root}",
+        f"--checkout=origin/{args.ref}",
+        "--no-chromium-history",
+    ]
+    if with_pgo_profiles(arch):
+        cli_args.append("--with-pgo-profiles")
+    cli_args.extend(["--no-build", "--no-distrib", *rest])
+
+    run(cli_args)
 
     repair_corrupt_entries(cef)
     run(["gclient", "sync", "--nohooks", "--no-history"], cwd=cef.chromium_dir)
     run(["gclient", "runhooks"], cwd=cef.chromium_dir)
-    create.run_command(argparse.Namespace(ref=args.ref), [])
+    create.run_command(argparse.Namespace(ref=args.ref, arch=arch), [])
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Sync Chromium/CEF and generate build files.")
     add_ref(parser)
-    parser.add_argument(
-        "--arch",
-        choices=["x64", "arm64"],
-        help="Target architecture passed to automate-git.py. Defaults to arm64 on macOS.",
-    )
+    add_arch_args(parser)
     args, rest = parser.parse_known_args(argv)
     run_command(args, rest)
 

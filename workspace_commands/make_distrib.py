@@ -8,7 +8,15 @@ if __package__ is None:
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from workspace_commands.common import add_ref, default_arch, init_env, run
+from workspace_commands.common import (
+    add_arch_args,
+    add_ref,
+    cef_build_args,
+    configure_build_environment,
+    init_env,
+    run,
+    selected_arch,
+)
 
 
 def add_parser(subparsers):
@@ -19,18 +27,20 @@ def add_parser(subparsers):
         action="store_true",
         help="Create a minimal distribution instead of an allow-partial full distribution.",
     )
-    parser.add_argument(
-        "--arch",
-        choices=["x64", "arm64"],
-        help="Target architecture. Defaults to arm64 on macOS and x64 elsewhere.",
-    )
+    add_arch_args(parser)
     return parser
 
 
 def run_command(args, rest):
     cef = init_env(args.ref)
-    arch = args.arch or default_arch()
-    cli_args = ["--output-dir", cef.cef_dir / "binary_distrib", "--ninja-build", f"--{arch}-build"]
+    arch = selected_arch(args)
+    configure_build_environment(arch)
+    cli_args = [
+        "--output-dir",
+        cef.cef_dir / "binary_distrib",
+        "--ninja-build",
+        *cef_build_args(arch),
+    ]
     cli_args.append("--minimal" if args.minimal else "--allow-partial")
     if any(arg == "--output-dir" or arg.startswith("--output-dir=") for arg in rest):
         cli_args = cli_args[2:]
@@ -45,11 +55,7 @@ def main(argv=None):
         action="store_true",
         help="Create a minimal distribution instead of an allow-partial full distribution.",
     )
-    parser.add_argument(
-        "--arch",
-        choices=["x64", "arm64"],
-        help="Target architecture. Defaults to arm64 on macOS and x64 elsewhere.",
-    )
+    add_arch_args(parser)
     args, rest = parser.parse_known_args(argv)
     run_command(args, rest)
 
