@@ -12,7 +12,7 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from workspace_commands import create
-from workspace_commands.common import SCRIPT_DIR, add_ref, init_env, run, set_gn_defines
+from workspace_commands.common import add_ref, ensure_automate_git, init_env, run, set_gn_defines
 
 
 DESTRUCTIVE_FLAGS = {
@@ -115,7 +115,7 @@ def run_command(args, rest):
     run(
         [
             "python3",
-            SCRIPT_DIR / "automate-git.py",
+            ensure_automate_git(),
             f"--download-dir={cef.root}",
             f"--checkout=origin/{args.ref}",
             "--no-chromium-history",

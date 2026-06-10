@@ -3,10 +3,15 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
+from urllib.request import urlopen
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CEF_ARCHIVE_FORMAT = "tar.bz2"
+AUTOMATE_GIT_PATH = SCRIPT_DIR / "automate-git.py"
+AUTOMATE_GIT_URL = (
+    "https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automate/automate-git.py"
+)
 
 
 class CefEnv:
@@ -84,6 +89,23 @@ def run(cmd, cwd=None):
     completed = subprocess.run(resolved, cwd=str(cwd) if cwd else None)
     if completed.returncode:
         raise SystemExit(completed.returncode)
+
+
+def ensure_automate_git():
+    if AUTOMATE_GIT_PATH.exists():
+        return AUTOMATE_GIT_PATH
+
+    temp_path = AUTOMATE_GIT_PATH.with_suffix(".py.tmp")
+    print(f"Downloading {AUTOMATE_GIT_URL} to {AUTOMATE_GIT_PATH}")
+    try:
+        with urlopen(AUTOMATE_GIT_URL) as response, temp_path.open("wb") as output:
+            shutil.copyfileobj(response, output)
+        temp_path.replace(AUTOMATE_GIT_PATH)
+    finally:
+        if temp_path.exists():
+            temp_path.unlink()
+
+    return AUTOMATE_GIT_PATH
 
 
 def default_arch():
