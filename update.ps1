@@ -35,9 +35,6 @@ if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cef.CefDir '.git'))) {
     }
 }
 
-$env:GN_DEFINES         = "is_official_build=true"
-$env:CEF_ARCHIVE_FORMAT = "tar.bz2"
-
 # 1. Chromium/CEF checkout + version patches. --with-pgo-profiles makes a fresh
 #    .gclient enable PGO profile download (required by the Release config).
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `

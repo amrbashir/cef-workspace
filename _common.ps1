@@ -5,6 +5,8 @@ function Initialize-CefEnv {
     $env:Path                      = "$root\depot_tools;$env:Path"
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
     $env:GYP_MSVS_VERSION          = "2022"
+    $env:GN_DEFINES         = "is_official_build=true"
+    $env:CEF_ARCHIVE_FORMAT = "tar.bz2"
     [PSCustomObject]@{
         Root        = $root
         ChromiumDir = "$root\chromium"

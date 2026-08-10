@@ -8,9 +8,6 @@ param(
 . "$PSScriptRoot\_common.ps1"
 $cef = Initialize-CefEnv
 
-$env:GN_DEFINES         = "is_official_build=true"
-$env:CEF_ARCHIVE_FORMAT = "tar.bz2"
-
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
     --download-dir=$($cef.Root) `
     --branch=$Ref `
