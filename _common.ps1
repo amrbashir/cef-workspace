@@ -1,8 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 function Initialize-CefEnv {
-    param([Parameter(Mandatory)][string]$Ref)
-    $root = "$PSScriptRoot\checkouts\$Ref"
+    $root = "$PSScriptRoot\chromium_git"
     $env:Path                      = "$root\depot_tools;$env:Path"
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
     $env:GYP_MSVS_VERSION          = "2022"

@@ -6,7 +6,7 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv -Ref $Ref
+$cef = Initialize-CefEnv
 $entriesFile = "$($cef.ChromiumDir)\.gclient_entries"
 
 # 0. Refuse to run destructive automate-git flags while src/cef has work that
@@ -42,7 +42,8 @@ $env:CEF_ARCHIVE_FORMAT = "tar.bz2"
 #    .gclient enable PGO profile download (required by the Release config).
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
     --download-dir=$($cef.Root) `
-    --checkout=origin/$Ref `
+    --url=https://github.com/chromiumembedded/cef.git `
+    --branch=$Ref `
     --no-chromium-history `
     --with-pgo-profiles `
     --no-build `
@@ -83,4 +84,4 @@ try {
 }
 
 # 4. Apply CEF patches and generate the GN build files (Debug + Release).
-& "$PSScriptRoot\create.ps1" -Ref $Ref
+& "$PSScriptRoot\create.ps1"

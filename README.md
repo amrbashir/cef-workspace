@@ -1,9 +1,11 @@
 # CEF Workspace
 
 Wrapper scripts around CEF's `automate-git.py` and `depot_tools` for working on
-Chromium/CEF on Windows. Checkouts live under `checkouts\<ref>\` (default ref:
-`master`). All scripts accept `-Ref <name>` and forward trailing arguments to
-the underlying tool.
+Chromium/CEF on Windows. The checkout lives under `chromium_git\`. The first
+`update.ps1` or `build-official.ps1` run creates that root, and the other
+scripts operate on the same checkout. Use `-Ref <branch>` with `update.ps1`
+or `build-official.ps1` to choose the CEF branch for that clone. Scripts forward
+other trailing arguments to the underlying tool.
 
 ### Local development
 
@@ -27,12 +29,12 @@ the underlying tool.
 
 ### Scripts
 
-| Script               | Purpose                                                                                  |
-| -------------------- | ---------------------------------------------------------------------------------------- |
+| Script               | Purpose                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
 | `update.ps1`         | Sync Chromium + CEF, repair corrupt deps, run `gclient sync`/`runhooks`, call `create.ps1`. |
-| `create.ps1`         | Apply CEF patches and regenerate GN build files (`tools\gclient_hook.py`).               |
-| `build.ps1`          | Build CEF with `autoninja`. Debug by default; `-Release $true` for Release.              |
-| `make_distrib.ps1`   | Package a binary distribution (`tools\make_distrib.bat --ninja-build`).                  |
-| `build-official.ps1` | One-shot official Release x64 build via `automate-git.py` (PGO, minimal distrib).        |
-| `fix_style.ps1`      | Reformat CEF sources (`tools\fix_style.py`).                                             |
-| `patch_updater.ps1`  | Regenerate CEF patch files from the current tree (`tools\patch_updater.py`).             |
+| `create.ps1`         | Apply CEF patches and regenerate GN build files (`tools\gclient_hook.py`).                  |
+| `build.ps1`          | Build CEF with `autoninja`. Debug by default; `-Release $true` for Release.                 |
+| `make_distrib.ps1`   | Package a binary distribution (`tools\make_distrib.bat --ninja-build`).                     |
+| `build-official.ps1` | One-shot official Release x64 build via `automate-git.py` (PGO, minimal distrib).           |
+| `fix_style.ps1`      | Reformat CEF sources (`tools\fix_style.py`).                                                |
+| `patch_updater.ps1`  | Regenerate CEF patch files from the current tree (`tools\patch_updater.py`).                |

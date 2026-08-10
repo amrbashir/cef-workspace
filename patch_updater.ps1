@@ -1,12 +1,11 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
-    [string]$Ref = "master",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv -Ref $Ref
+$cef = Initialize-CefEnv
 
 Push-Location $cef.CefDir
 try {

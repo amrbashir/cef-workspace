@@ -1,12 +1,11 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
-    [string]$Ref = "master",
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv -Ref $Ref
+$cef = Initialize-CefEnv
 
 $env:GN_DEFINES   = "is_component_build=true"
 $env:GN_ARGUMENTS = "--ide=vs2022 --sln=cef --filters=//cef/*"

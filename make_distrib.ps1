@@ -1,13 +1,12 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
-    [string]$Ref = "master",
     [switch]$Minimal,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv -Ref $Ref
+$cef = Initialize-CefEnv
 
 $cliArgs = @("--ninja-build", "--x64-build")
 if ($Minimal) {
