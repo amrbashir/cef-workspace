@@ -18,7 +18,13 @@ function Initialize-CefEnv {
 # $ErrorActionPreference='Stop' does not catch native non-zero exits, so we
 # check $LASTEXITCODE here to give every script consistent fail-fast behavior.
 function Invoke-Native {
-    $cmd, $rest = $args
-    & $cmd @rest
+    $cmd = $args[0]
+    [object[]]$nativeArgs = if ($args.Count -gt 1) {
+        $args[1..($args.Count - 1)]
+    } else {
+        @()
+    }
+
+    & $cmd @nativeArgs
     if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
