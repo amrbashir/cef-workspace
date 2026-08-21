@@ -6,11 +6,10 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
 
 $outDir = if ($Release) { "out\Release_GN_x64" } else { "out\Debug_GN_x64" }
 
-Push-Location "$($cef.ChromiumDir)\src"
+Push-Location "$CEF_CHROMIUM_DIR\src"
 try {
     Invoke-Native autoninja -C $outDir cef @Rest
 } finally {

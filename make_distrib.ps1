@@ -6,7 +6,6 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
 
 $cliArgs = @("--ninja-build", "--x64-build")
 if ($Minimal) {
@@ -16,7 +15,7 @@ if ($Minimal) {
 }
 if ($Rest) { $cliArgs += $Rest }
 
-Push-Location $cef.CefDir
+Push-Location $CEF_DIR
 try {
     Invoke-Native .\tools\make_distrib.bat @cliArgs
 } finally {

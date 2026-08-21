@@ -5,12 +5,10 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
 
-$env:GN_DEFINES   = "is_component_build=true"
 $env:GN_ARGUMENTS = "--ide=vs2022 --sln=cef --filters=//cef/*"
 
-Push-Location $cef.CefDir
+Push-Location $CEF_DIR
 try {
     Invoke-Native python3 tools\gclient_hook.py @Rest
 } finally {

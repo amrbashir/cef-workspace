@@ -5,9 +5,8 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
 
-Push-Location $cef.CefDir
+Push-Location $CEF_DIR
 try {
     Invoke-Native python3 tools\patch_updater.py @Rest
 } finally {

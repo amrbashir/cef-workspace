@@ -6,10 +6,10 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
+$env:GN_DEFINES = "is_official_build=true"
 
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
-    --download-dir=$($cef.Root) `
+    --download-dir=$CEF_ROOT `
     --branch=$Ref `
     --no-chromium-history `
     --minimal-distrib-only `

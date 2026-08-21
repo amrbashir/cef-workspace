@@ -6,8 +6,7 @@ param(
 )
 
 . "$PSScriptRoot\_common.ps1"
-$cef = Initialize-CefEnv
-$entriesFile = "$($cef.ChromiumDir)\.gclient_entries"
+$entriesFile = "$CEF_CHROMIUM_DIR\.gclient_entries"
 
 # 0. Refuse to run destructive automate-git flags while src/cef has work that
 #    isn't safely on a remote. These flags blow away local changes (see
@@ -16,18 +15,18 @@ $entriesFile = "$($cef.ChromiumDir)\.gclient_entries"
 #    --force` and `gclient sync --reset`).
 $destructiveFlags = @('--force-clean', '--force-clean-deps', '--force-update', '--force-cef-update')
 $requested = @($Rest | Where-Object { $destructiveFlags -contains $_ })
-if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cef.CefDir '.git'))) {
-    $dirty   = & git -C $cef.CefDir status --porcelain
+if ($requested.Count -gt 0 -and (Test-Path (Join-Path $CEF_DIR '.git'))) {
+    $dirty   = & git -C $CEF_DIR status --porcelain
     $unpushed = ''
-    & git -C $cef.CefDir rev-parse --abbrev-ref --symbolic-full-name '@{u}' > $null 2>&1
+    & git -C $CEF_DIR rev-parse --abbrev-ref --symbolic-full-name '@{u}' > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        $unpushed = & git -C $cef.CefDir log '@{u}..HEAD' --oneline
+        $unpushed = & git -C $CEF_DIR log '@{u}..HEAD' --oneline
     } else {
         # No upstream configured -- treat HEAD as unpushed so the user is warned.
-        $unpushed = & git -C $cef.CefDir log -1 --oneline
+        $unpushed = & git -C $CEF_DIR log -1 --oneline
     }
     if ($dirty -or $unpushed) {
-        Write-Host "ERROR: $($requested -join ', ') would discard work in $($cef.CefDir)" -ForegroundColor Red
+        Write-Host "ERROR: $($requested -join ', ') would discard work in $CEF_DIR" -ForegroundColor Red
         if ($dirty)    { Write-Host "  uncommitted changes:"; $dirty    | ForEach-Object { Write-Host "    $_" } }
         if ($unpushed) { Write-Host "  unpushed commits:";    $unpushed | ForEach-Object { Write-Host "    $_" } }
         Write-Host "Commit and push, or move the work elsewhere, then re-run." -ForegroundColor Yellow
@@ -38,7 +37,7 @@ if ($requested.Count -gt 0 -and (Test-Path (Join-Path $cef.CefDir '.git'))) {
 # 1. Chromium/CEF checkout + version patches. --with-pgo-profiles makes a fresh
 #    .gclient enable PGO profile download (required by the Release config).
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
-    --download-dir=$($cef.Root) `
+    --download-dir=$CEF_ROOT `
     --url=https://github.com/chromiumembedded/cef.git `
     --branch=$Ref `
     --no-chromium-history `
@@ -59,7 +58,7 @@ if (Test-Path $entriesFile) {
              ForEach-Object { $_.Matches[0].Groups[1].Value } |
              Where-Object { $_ -ne 'src' -and $_ -notmatch '[<>:"|?*]' }
     foreach ($rel in $paths) {
-        $full = Join-Path $cef.ChromiumDir ($rel -replace '/', '\')
+        $full = Join-Path $CEF_CHROMIUM_DIR ($rel -replace '/', '\')
         if (Test-Path (Join-Path $full ".git")) {
             & git -C $full rev-parse --verify --quiet HEAD > $null 2>&1
             if ($LASTEXITCODE -ne 0) {
@@ -72,7 +71,7 @@ if (Test-Path $entriesFile) {
 
 # 3. Complete the DEPS sync. Resumable: only fetches what's missing, and is
 #    a no-op when the tree is already complete.
-Push-Location $cef.ChromiumDir
+Push-Location $CEF_CHROMIUM_DIR
 try {
     Invoke-Native gclient sync --nohooks --no-history
     Invoke-Native gclient runhooks
