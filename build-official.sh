@@ -40,7 +40,7 @@ python3 "$SCRIPT_DIR/automate-git.py" \
     --no-chromium-history \
     --minimal-distrib-only \
     --no-debug-build \
-    --x64-build \
+    "$CEF_BUILD_FLAG" \
     --no-distrib-docs \
     --no-distrib-symbols \
     --with-pgo-profiles \

@@ -9,6 +9,21 @@ export CEF_ROOT CEF_CHROMIUM_DIR CEF_DIR
 export PATH="$CEF_ROOT/depot_tools:$PATH"
 export CEF_ARCHIVE_FORMAT="tar.bz2"
 
+case "$(uname -m)" in
+    arm64|aarch64)
+        CEF_BUILD_ARCH=arm64
+        CEF_BUILD_FLAG=--arm64-build
+        ;;
+    x86_64|amd64)
+        CEF_BUILD_ARCH=x64
+        CEF_BUILD_FLAG=--x64-build
+        ;;
+    *)
+        echo "ERROR: Unsupported architecture: $(uname -m)" >&2
+        return 1 2>/dev/null || exit 1
+        ;;
+esac
+
 case "$(uname -s)" in
     Darwin)
         export GN_DEFINES="is_component_build=true"

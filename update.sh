@@ -33,11 +33,6 @@ while (($#)); do
     esac
 done
 
-platform_args=()
-if [[ "$(uname -s)" == Darwin ]]; then
-    platform_args+=(--arm64-build)
-fi
-
 # Refuse automate-git options that could erase CEF work not safely stored on a
 # remote. A branch without an upstream is treated as having an unpushed HEAD.
 requested=()
@@ -83,7 +78,7 @@ python3 "$SCRIPT_DIR/automate-git.py" \
     --with-pgo-profiles \
     --no-build \
     --no-distrib \
-    "${platform_args[@]}" \
+    "$CEF_BUILD_FLAG" \
     "${rest[@]}"
 
 # Remove interrupted git dependencies whose HEAD cannot be resolved, allowing

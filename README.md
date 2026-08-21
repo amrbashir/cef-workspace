@@ -34,6 +34,6 @@ to the underlying tool.
 | `create.ps1/.sh`         | Apply CEF patches and regenerate GN build files (`tools\gclient_hook.py`).                      |
 | `build.ps1/.sh`          | Build CEF with `autoninja`. Debug by default; `-Release $true` for Release.                     |
 | `make_distrib.ps1/.sh`   | Package a binary distribution (`tools\make_distrib.bat --ninja-build`).                         |
-| `build-official.ps1/.sh` | One-shot official Release x64 build via `automate-git.py` (PGO, minimal distrib).               |
+| `build-official.ps1/.sh` | One-shot official Release build via `automate-git.py` (PGO, minimal distrib).                   |
 | `fix_style.ps1/.sh`      | Reformat CEF sources (`tools\fix_style.py`).                                                    |
 | `patch_updater.ps1/.sh`  | Regenerate CEF patch files from the current tree (`tools\patch_updater.py`).                    |

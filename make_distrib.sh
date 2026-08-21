@@ -25,7 +25,7 @@ while (($#)); do
     esac
 done
 
-cli_args=(--ninja-build --x64-build)
+cli_args=(--ninja-build "$CEF_BUILD_FLAG")
 if "$minimal"; then
     cli_args+=(--minimal)
 else
