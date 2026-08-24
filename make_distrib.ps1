@@ -15,9 +15,9 @@ if ($Minimal) {
 }
 if ($Rest) { $cliArgs += $Rest }
 
-Push-Location $CEF_DIR
+Push-Location $CEF_DIR\tools
 try {
-    Invoke-Native .\tools\make_distrib.bat @cliArgs
+    Invoke-Native .\make_distrib.bat @cliArgs
 } finally {
     Pop-Location
 }

@@ -33,5 +33,5 @@ else
 fi
 cli_args+=("${rest[@]}")
 
-cd "$CEF_DIR"
-tools/make_distrib.sh "${cli_args[@]}"
+cd "$CEF_DIR/tools"
+./make_distrib.sh "${cli_args[@]}"
