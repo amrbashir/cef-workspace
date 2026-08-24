@@ -8,7 +8,7 @@ param(
 
 Push-Location $CEF_DIR\tools
 try {
-    Invoke-Native .\make_distrib.bat --ninja-build $CEF_BUILD_FLAG --minimal @Rest
+    Invoke-Native .\make_distrib.bat --ninja-build $CEF_BUILD_FLAG --minimal --no-symbols @Rest
 } finally {
     Pop-Location
 }
