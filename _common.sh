@@ -24,15 +24,25 @@ case "$(uname -m)" in
         ;;
 esac
 
+CEF_DEBUG_CONFIG="Debug_GN_$CEF_BUILD_ARCH"
+CEF_RELEASE_CONFIG="Release_GN_$CEF_BUILD_ARCH"
+
 case "$(uname -s)" in
     Darwin)
-        export GN_DEFINES="is_component_build=true"
+        CEF_DEBUG_DEFINES="is_component_build=true"
+        CEF_RELEASE_DEFINES="is_component_build=false"
         ;;
     Linux)
-        export GN_DEFINES="use_sysroot=true use_allocator=none symbol_level=1 is_cfi=false use_thin_lto=false"
+        _cef_base_defines="use_sysroot=true use_allocator=none symbol_level=1 is_cfi=false use_thin_lto=false"
+        CEF_DEBUG_DEFINES="$_cef_base_defines is_component_build=true"
+        CEF_RELEASE_DEFINES="$_cef_base_defines is_component_build=false"
+        unset _cef_base_defines
         ;;
     *)
         echo "ERROR: Unsupported platform: $(uname -s)" >&2
         return 1 2>/dev/null || exit 1
         ;;
 esac
+
+export CEF_BUILD_ARCH CEF_BUILD_FLAG
+export CEF_DEBUG_CONFIG CEF_RELEASE_CONFIG CEF_DEBUG_DEFINES CEF_RELEASE_DEFINES

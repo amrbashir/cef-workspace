@@ -8,8 +8,18 @@ $CEF_DIR          = "$CEF_CHROMIUM_DIR\src\cef"
 $env:Path                      = "$CEF_ROOT\depot_tools;$env:Path"
 $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
 $env:GYP_MSVS_VERSION          = "2022"
-$env:GN_DEFINES                = "is_component_build=true"
 $env:CEF_ARCHIVE_FORMAT        = "tar.bz2"
+
+switch ($env:PROCESSOR_ARCHITECTURE) {
+    'ARM64' { $CEF_BUILD_ARCH = 'arm64'; $CEF_BUILD_FLAG = '--arm64-build' }
+    'AMD64' { $CEF_BUILD_ARCH = 'x64';   $CEF_BUILD_FLAG = '--x64-build' }
+    default { throw "Unsupported architecture: $env:PROCESSOR_ARCHITECTURE" }
+}
+
+$CEF_DEBUG_CONFIG    = "Debug_GN_$CEF_BUILD_ARCH"
+$CEF_RELEASE_CONFIG  = "Release_GN_$CEF_BUILD_ARCH"
+$CEF_DEBUG_DEFINES   = "is_component_build=true"
+$CEF_RELEASE_DEFINES = "is_component_build=false"
 
 # Run a native command and exit the calling script if it fails.
 # $ErrorActionPreference='Stop' does not catch native non-zero exits, so we

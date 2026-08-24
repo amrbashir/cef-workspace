@@ -26,9 +26,9 @@ while (($#)); do
 done
 
 if "$release"; then
-    out_dir="out/Release_GN_$CEF_BUILD_ARCH"
+    out_dir="out/$CEF_RELEASE_CONFIG"
 else
-    out_dir="out/Debug_GN_$CEF_BUILD_ARCH"
+    out_dir="out/$CEF_DEBUG_CONFIG"
 fi
 
 cd "$CEF_CHROMIUM_DIR/src"

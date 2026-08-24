@@ -7,7 +7,7 @@ param(
 
 . "$PSScriptRoot\_common.ps1"
 
-$outDir = if ($Release) { "out\Release_GN_x64" } else { "out\Debug_GN_x64" }
+$outDir = if ($Release) { "out\$CEF_RELEASE_CONFIG" } else { "out\$CEF_DEBUG_CONFIG" }
 
 Push-Location "$CEF_CHROMIUM_DIR\src"
 try {
