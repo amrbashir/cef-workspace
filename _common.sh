@@ -30,12 +30,12 @@ CEF_RELEASE_CONFIG="Release_GN_$CEF_BUILD_ARCH"
 case "$(uname -s)" in
     Darwin)
         CEF_DEBUG_DEFINES="is_component_build=true"
-        CEF_RELEASE_DEFINES="is_component_build=false"
+        CEF_RELEASE_DEFINES="is_official_build=true"
         ;;
     Linux)
         _cef_base_defines="use_sysroot=true use_allocator=none symbol_level=1 is_cfi=false use_thin_lto=false"
         CEF_DEBUG_DEFINES="$_cef_base_defines is_component_build=true"
-        CEF_RELEASE_DEFINES="$_cef_base_defines is_component_build=false"
+        CEF_RELEASE_DEFINES="$_cef_base_defines is_official_build=true"
         unset _cef_base_defines
         ;;
     *)

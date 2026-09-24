@@ -19,7 +19,7 @@ switch ($env:PROCESSOR_ARCHITECTURE) {
 $CEF_DEBUG_CONFIG    = "Debug_GN_$CEF_BUILD_ARCH"
 $CEF_RELEASE_CONFIG  = "Release_GN_$CEF_BUILD_ARCH"
 $CEF_DEBUG_DEFINES   = "is_component_build=true"
-$CEF_RELEASE_DEFINES = "is_component_build=false"
+$CEF_RELEASE_DEFINES = "is_official_build=true"
 
 # Run a native command and exit the calling script if it fails.
 # $ErrorActionPreference='Stop' does not catch native non-zero exits, so we
