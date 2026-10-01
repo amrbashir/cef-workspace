@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/_common.sh"
 python3 "$SCRIPT_DIR/automate-git.py" \
     "--download-dir=$CEF_ROOT" \
     --url=https://github.com/chromiumembedded/cef.git \
-    --checkout=master \
+    --checkout=origin/master \
     --no-chromium-history \
     --with-pgo-profiles \
     --no-build \

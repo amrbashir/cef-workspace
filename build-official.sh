@@ -8,7 +8,7 @@ export GN_DEFINES="is_official_build=true"
 
 python3 "$SCRIPT_DIR/automate-git.py" \
     "--download-dir=$CEF_ROOT" \
-    --checkout=master \
+    --checkout=origin/master \
     --no-chromium-history \
     --minimal-distrib-only \
     --no-debug-build \

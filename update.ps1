@@ -6,12 +6,12 @@ $entriesFile = "$CEF_CHROMIUM_DIR\.gclient_entries"
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
     --download-dir=$CEF_ROOT `
     --url=https://github.com/chromiumembedded/cef.git `
-    --checkout=master `
+    --checkout=origin/master `
     --no-chromium-history `
     --with-pgo-profiles `
     --no-build `
     --no-distrib `
-    @Rest
+    @args
 
 # 2. Repair deps left corrupt by an interrupted sync: a .git directory with no
 #    resolvable HEAD. gclient can't recover these (and `gclient sync --force`

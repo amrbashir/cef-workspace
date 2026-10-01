@@ -3,7 +3,7 @@ $env:GN_DEFINES = "is_official_build=true"
 
 Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
     --download-dir=$CEF_ROOT `
-    --checkout=master `
+    --checkout=origin/master `
     --no-chromium-history `
     --minimal-distrib-only `
     --no-debug-build `
@@ -11,4 +11,4 @@ Invoke-Native python3 "$PSScriptRoot\automate-git.py" `
     --no-distrib-docs `
     --no-distrib-symbols `
     --with-pgo-profiles `
-    @Rest
+    @args
