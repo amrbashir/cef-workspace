@@ -47,4 +47,12 @@ cat > "$out_dir/archive.json" <<JSON
 }
 JSON
 
-echo "CEF_PATH=$out_dir"
+echo "export CEF_PATH=$out_dir"
+case "$(uname -s)" in
+    Darwin)
+        echo "export DYLD_FALLBACK_LIBRARY_PATH=\"\$DYLD_FALLBACK_LIBRARY_PATH:\$CEF_PATH:\$CEF_PATH/Chromium Embedded Framework.framework/Libraries\""
+        ;;
+    Linux)
+        echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:\$CEF_PATH\""
+        ;;
+esac
